@@ -17,7 +17,22 @@ function scroll() {
 
 function selectRandom() {
     const tracks = document.querySelectorAll('.trackList__item.sc-border-light-bottom');
-    tracks[Math.floor(Math.random() * Math.floor(tracks.length))].querySelector('a').click();
+    const randomIndex = Math.floor(Math.random() * Math.floor(tracks.length));
+    let clicked = false;
+
+    // Check if track is properly loaded, otherwise it needs to retry
+    if (tracks[randomIndex].querySelector('a.playButton')) {
+        tracks[randomIndex].querySelector('a.playButton').click();
+    } else {
+        const interval = setInterval(() => {
+            if (clicked)
+                clearInterval(interval);
+            if (tracks[randomIndex].querySelector('a.playButton')) {
+                clicked = true;
+                tracks[randomIndex].querySelector('a.playButton').click();
+            }
+        }, 100);
+    }
 }
 
 function displayToast() {
