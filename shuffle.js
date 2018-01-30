@@ -1,14 +1,13 @@
 function sleep(time) {
-    return new Promise(function (resolve) {
-        setTimeout(resolve, time)
-    });
+    return new Promise((resolve) => setTimeout(resolve, time));
 }
 
 function scroll() {
     window.scrollTo(0, document.body.scrollHeight);
 
-    sleep(300).then(function () {
+    sleep(300).then(() => {
         if (document.querySelector('.paging-eof')) {
+            removeToast();
             selectRandom();
         } else {
             scroll();
@@ -21,10 +20,42 @@ function selectRandom() {
     tracks[Math.floor(Math.random() * Math.floor(tracks.length))].querySelector('a').click();
 }
 
+function displayToast() {
+    const style = `
+        width:300px;
+        height:30px;
+        position:fixed;
+        left:50%;
+        margin-left:-150px;
+        bottom:50%;
+        background-color: #383838;
+        color: #F0F0F0;
+        font-family: sans-serif;
+        font-size: 20px;
+        padding:10px;
+        text-align:center;
+        border-radius: 2px;
+        z-index: 1000;
+        -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+        -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+        box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);`;
+    const toast = document.createElement('div');
+    toast.id = 'sc-random-toast';
+    toast.style = style;
+    toast.innerText = 'Loading All Tracks. Please wait.';
+    document.body.appendChild(toast);
+}
+
+function removeToast() {
+    const toast = document.getElementById('sc-random-toast');
+    toast.parentNode.removeChild(toast);
+}
+
 function main() {
     if (document.querySelector('.paging-eof')) {
         selectRandom();
     } else {
+        displayToast();
         scroll();
     }
 }
