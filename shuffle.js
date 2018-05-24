@@ -2,6 +2,16 @@ function sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
 
+function convertTimeToSeconds(timeString) {
+    var separated = timeString.split(':');
+
+   var seconds = parseInt(separated[separated.length - 1]);
+    var minutes = separated.length > 1 ? parseInt(separated[separated.length - 2]) : 0;
+    var hours = separated.length > 2 ? parseInt(separated[0]) : 0;
+
+    return (hours * 3600) + (minutes * 60) + seconds;
+}
+
 function scroll() {
     window.scrollTo(0, document.body.scrollHeight);
 
@@ -33,6 +43,27 @@ function selectRandom() {
             }
         }, 100);
     }
+
+    setShuffleEvent();
+}
+
+function setShuffleEvent() {
+    setTimeout(function() {
+        var passedTime = document.querySelector('.playbackTimeline__timePassed span:last-child').innerText;
+        var totalTime = document.querySelector('.playbackTimeline__duration span:last-child').innerText;
+        var passedSeconds = convertTimeToSeconds(passedTime);
+        var totalSeconds = convertTimeToSeconds(totalTime);
+
+        var secondsToFinish = totalSeconds - passedSeconds;
+
+        var shuffleTimeout = setTimeout(selectRandom, (secondsToFinish - 2) * 1000);
+        console.log('shuffling in ' + secondsToFinish + ' seconds');
+
+        document.querySelector('.playControls__next').addEventListener('click', function() {
+            clearTimeout(shuffleTimeout);
+            document.querySelector('.playControls__next').removeEventListener('click');
+        });
+    }, 3000);
 }
 
 function displayToast() {
@@ -80,3 +111,9 @@ if (document.readyState === 'complete') {
 } else {
     document.addEventListener('DOMContentLoaded', main);
 }
+
+document.addEventListener('keypress', (e) => {
+    if (e.keyCode === 72 && (e.metaKey === '⌘-' || e.ctrlKey && e.keyCode)) {
+        main();
+    }
+});
